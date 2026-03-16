@@ -1,0 +1,16 @@
+{
+  "name": "sourcegraph-claudecode-plugin",
+  "owner": {
+    "name": "Sourcegraph Community"
+  },
+  "metadata": {
+    "description": "Sourcegraph MCP plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "sourcegraph",
+      "source": "./",
+      "description": "Use Sourcegraph MCP from Claude Code for code search, navigation, history, and Deep Search."
+    }
+  ]
+}

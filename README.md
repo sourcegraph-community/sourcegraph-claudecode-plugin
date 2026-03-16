@@ -2,89 +2,109 @@
 
 Sourcegraph plugin for Claude Code that adds:
 
-- Sourcegraph MCP server connectivity
-- Reusable Sourcegraph commands
-- A `searching-sourcegraph` skill for agent workflows
+- Sourcegraph MCP server connectivity (code search, navigation, Deep Search)
+- `/sourcegraph:sg-search` and `/sourcegraph:sg-file` skills
+- `searching-sourcegraph` agent skill for disciplined search workflows
 
-Built from:
+## Prerequisites
 
-- https://github.com/sourcegraph-community/sourcegraph-cursor-plugin
-- https://github.com/sourcegraph-community/sourcegraph-gemini
-- https://github.com/sourcegraph-community/sourcegraph-skill
+- [Claude Code](https://code.claude.com) version 1.0.33 or later (`claude --version`)
+- A Sourcegraph instance with MCP enabled
+- A Sourcegraph access token with `mcp` scope
 
-and aligned with:
-
-- Claude Code plugin docs: https://code.claude.com/docs/en/plugins
-- Sourcegraph MCP docs: https://sourcegraph.com/docs/api/mcp
-
-## Structure
-
-```text
-.
-├── .claude-plugin/
-│   └── plugin.json
-├── .mcp.json
-├── commands/
-│   ├── sg-file.md
-│   └── sg-search.md
-├── skills/
-│   └── searching-sourcegraph/
-│       └── SKILL.md
-└── README.md
-```
-
-## Use In Claude Code
-
-Run Claude Code with this plugin directory:
-
-```bash
-claude --plugin-dir ./sourcegraph-claudecode-plugin
-```
-
-Or from this repository root:
-
-```bash
-claude --plugin-dir .
-```
-
-Then restart Claude Code after changes and verify:
-
-- `/help` shows `/sourcegraph:sg-search` and `/sourcegraph:sg-file`
-- `/mcp` shows the `sourcegraph` MCP server
-
-## Configuration
-
-Set environment variables used by `.mcp.json`:
-
-- `SOURCEGRAPH_ENDPOINT` (for example `https://sourcegraph.com`)
-- `SOURCEGRAPH_ACCESS_TOKEN` (personal access token with `mcp` scope)
-
-Example:
+Set the required environment variables in your shell profile (`.zshrc`, `.bashrc`, etc.):
 
 ```bash
 export SOURCEGRAPH_ENDPOINT="https://sourcegraph.example.com"
 export SOURCEGRAPH_ACCESS_TOKEN="<your-token>"
 ```
 
-## Verified MCP Details
+## Install (permanent)
 
-This plugin follows Sourcegraph MCP docs:
-
-- Endpoint is `${SOURCEGRAPH_ENDPOINT}/.api/mcp`
-- HTTP transport is used (`"type": "http"`)
-- Access token auth header is `Authorization: token <token>`
-
-Also compatible with OAuth-first setup from docs:
+Add this repository as a marketplace, then install the plugin:
 
 ```bash
-claude mcp add --transport http sg https://sourcegraph.example.com/.api/mcp
+# From a local clone
+claude plugin marketplace add ./sourcegraph-claudecode-plugin
+
+# Or directly from GitHub
+claude plugin marketplace add sourcegraph-community/sourcegraph-claudecode-plugin
 ```
 
-## Included Commands
+Then install:
 
-- `/sourcegraph:sg-search` to run Sourcegraph search workflows
-- `/sourcegraph:sg-file` to fetch a file and summarize it
+```bash
+claude plugin install sourcegraph@sourcegraph-claudecode-plugin
+```
 
-## Included Skill
+Restart Claude Code after installing.
 
-- `searching-sourcegraph` for disciplined Sourcegraph search and navigation workflows
+## Install (per-session, for development)
+
+Load the plugin for a single session without installing permanently:
+
+```bash
+claude --plugin-dir ./sourcegraph-claudecode-plugin
+```
+
+Run `/reload-plugins` after making changes during a session.
+
+## Alternative: add MCP server only
+
+If you only want the Sourcegraph MCP tools without the skills, add the server directly:
+
+```bash
+claude mcp add --transport http sourcegraph \
+  "${SOURCEGRAPH_ENDPOINT}/.api/mcp" \
+  --header "Authorization: token ${SOURCEGRAPH_ACCESS_TOKEN}"
+```
+
+## Verify
+
+After installing, confirm everything loaded:
+
+- `/help` should list `sourcegraph:sg-search`, `sourcegraph:sg-file`, and `sourcegraph:searching-sourcegraph`
+- `/mcp` should show the `sourcegraph` MCP server as connected
+
+## Structure
+
+```text
+.
+├── .claude-plugin/
+│   ├── plugin.json
+│   └── marketplace.json
+├── .mcp.json
+├── skills/
+│   ├── sg-search/
+│   │   └── SKILL.md
+│   ├── sg-file/
+│   │   └── SKILL.md
+│   └── searching-sourcegraph/
+│       └── SKILL.md
+└── README.md
+```
+
+## Skills
+
+| Skill | Invocation | Purpose |
+|-------|------------|---------|
+| `sg-search` | `/sourcegraph:sg-search <query>` | Search Sourcegraph with natural language or keyword syntax |
+| `sg-file` | `/sourcegraph:sg-file <repo> [rev] <path>` | Fetch and summarize a file from Sourcegraph |
+| `searching-sourcegraph` | Auto-invoked by Claude | Disciplined search and navigation workflow using all Sourcegraph MCP tools |
+
+## MCP Details
+
+- Endpoint: `${SOURCEGRAPH_ENDPOINT}/.api/mcp`
+- Transport: HTTP (`"type": "http"`)
+- Auth header: `Authorization: token <token>`
+
+## Built from
+
+- [sourcegraph-cursor-plugin](https://github.com/sourcegraph-community/sourcegraph-cursor-plugin)
+- [sourcegraph-gemini](https://github.com/sourcegraph-community/sourcegraph-gemini)
+- [sourcegraph-skill](https://github.com/sourcegraph-community/sourcegraph-skill)
+
+## Docs
+
+- [Claude Code plugins](https://code.claude.com/docs/en/plugins)
+- [Sourcegraph MCP](https://sourcegraph.com/docs/api/mcp)
