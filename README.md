@@ -3,8 +3,7 @@
 Sourcegraph plugin for Claude Code that adds:
 
 - Sourcegraph MCP server connectivity (code search, navigation, Deep Search)
-- `/sourcegraph:sg-search` and `/sourcegraph:sg-file` skills
-- `searching-sourcegraph` agent skill for disciplined search workflows
+- `searching-sourcegraph` skill for disciplined search workflows (with supporting workflows and query patterns)
 
 ## Prerequisites
 
@@ -63,7 +62,7 @@ claude mcp add --transport http sourcegraph \
 
 After installing, confirm everything loaded:
 
-- `/help` should list `sourcegraph:sg-search`, `sourcegraph:sg-file`, and `sourcegraph:searching-sourcegraph`
+- `/help` should list `sourcegraph:searching-sourcegraph`
 - `/mcp` should show the `sourcegraph` MCP server as connected
 
 ## Structure
@@ -75,22 +74,23 @@ After installing, confirm everything loaded:
 │   └── marketplace.json
 ├── .mcp.json
 ├── skills/
-│   ├── sg-search/
-│   │   └── SKILL.md
-│   ├── sg-file/
-│   │   └── SKILL.md
 │   └── searching-sourcegraph/
-│       └── SKILL.md
+│       ├── SKILL.md
+│       ├── query-patterns.md
+│       ├── examples/
+│       │   └── common-searches.md
+│       └── workflows/
+│           ├── implementing-feature.md
+│           ├── understanding-code.md
+│           ├── debugging-issue.md
+│           ├── fixing-bug.md
+│           └── code-review.md
 └── README.md
 ```
 
-## Skills
+## Skill
 
-| Skill | Invocation | Purpose |
-|-------|------------|---------|
-| `sg-search` | `/sourcegraph:sg-search <query>` | Search Sourcegraph with natural language or keyword syntax |
-| `sg-file` | `/sourcegraph:sg-file <repo> [rev] <path>` | Fetch and summarize a file from Sourcegraph |
-| `searching-sourcegraph` | Auto-invoked by Claude | Disciplined search and navigation workflow using all Sourcegraph MCP tools |
+The plugin installs one skill: `searching-sourcegraph`. Claude auto-invokes it when you need to search or navigate code via Sourcegraph. It includes workflows for implementing features, understanding code, debugging issues, fixing bugs, and code review.
 
 ## MCP Details
 
